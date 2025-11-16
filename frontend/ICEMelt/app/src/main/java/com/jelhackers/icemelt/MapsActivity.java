@@ -30,14 +30,22 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.jelhackers.icemelt.databinding.ActivityMapsBinding;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
+    public FirebaseFirestore db;
+
     private ActivityMapsBinding binding;
 
     private TextView dropDownImageView;
@@ -45,13 +53,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final String[] alertTypes = {
             "ICE RAID"
     };
+    private final int[] alertImages = {
+            R.drawable.baseline_check_box_outline_blank_24
+    };
     private FusedLocationProviderClient fusedLocationClient;
     private LatLng currentLocation;
 
+    private ArrayList<POIObject> poiArrayList;
+
+    RecyclerView recyclerItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseApp.initializeApp(this);
+
+        FirebaseApp app = FirebaseApp.getInstance();
+        String projectId = app.getOptions().getProjectId();
+        Log.d("FIREBASE_DEBUG", "Connected to Firestore project: " + projectId);
+
+        db = FirebaseFirestore.getInstance();
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
@@ -68,6 +90,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Assigning ID of textView2 to a variable
         dropDownImageView = findViewById(R.id.textView2);
+
+        //recyclerItems = findViewById(R.id.recyclerItems);
+        //POIAdapter adapter = new POIAdapter(poiArrayList, this);
+
+        //GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
+
+        //recyclerItems.setLayoutManager(layoutManager);
+        //recyclerItems.setAdapter(adapter);
+        //recyclerItems.smoothScrollToPosition(poiArrayList.size());
+
+
 
         // "on click" operations to be performed
         dropDownImageView.setOnClickListener(v -> {
@@ -126,13 +159,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void retrieveAllMarkers(){
+        //Get all POIS and add them to the array list
+
+        //Iterate through the arraylist and add a pointer for each POI
         LatLng sydneyLatLong = new LatLng(-34, 151);
         Marker sydney = mMap.addMarker(
                 new MarkerOptions()
                         .position(sydneyLatLong)
                         .title("Sydney")
-                        .snippet("ICE RAID")
-                        .icon(bitmapDescriptorFromVector(R.drawable.baseline_check_box_outline_blank_24)));
+                        .snippet(alertTypes[0])
+                        .icon(bitmapDescriptorFromVector(alertImages[0])));
         sydney.hideInfoWindow();
     }
 
@@ -185,10 +221,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Button click logic
         btnSubmit.setOnClickListener(v -> {
-            Log.d("REPORT_SUBMIT", "User submitted a report for: " + locationNameTxt);
+            String locationName = locationNameTxt.getText().toString();
+            String description = descriptionTxt.getText().toString();
+            int typeIndex = reportTypes.getSelectedItemPosition();
 
-            String type = reportTypes.getSelectedItem().toString();
+            POIObject newPoi = new POIObject(latlng.latitude, latlng.longitude, typeIndex, locationName, description);
+
+            db.collection("POI")
+                    .add(newPoi)
+                    .addOnSuccessListener(aVoid -> Log.d("POIController","POI added"))
+                    .addOnFailureListener(e -> Log.e("POIController","Failed to add POI", e));
             dialog.dismiss();
+
+
+            // Add marker immediately
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .position(latlng)
+                    .title(locationName)
+                    .snippet(alertTypes[typeIndex])
+                    .icon(bitmapDescriptorFromVector(alertImages[typeIndex]))
+            );
+            marker.hideInfoWindow();
+
+            Log.d("REPORT_SUBMIT", "User submitted a report for: " + locationNameTxt);
         });
 
         btnCancel.setOnClickListener(v -> {
@@ -220,7 +275,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         TextView txtReportCount = popupView.findViewById(R.id.txtReportCount);
         ImageButton btnReport = popupView.findViewById(R.id.reportPOI);
         ImageButton btnConfirmPOI = popupView.findViewById(R.id.confirmPOI);
-        // Put your dynamic data here
+        // Get the POI and fill in the data based on that
         txtLocation.setText(marker.getTitle());
         txtAge.setText("Age: 27");
         txtDescription.setText("Description: Cool place!");
@@ -236,11 +291,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Button click logic
         btnReport.setOnClickListener(v -> {
             Log.d("REPORT_CLICK", "User clicked info window at: " + marker.getTitle());
+            //Delete the POI
             dialog.dismiss();
         });
 
         btnConfirmPOI.setOnClickListener(v -> {
             Log.d("REPORT_CLICK", "User clicked info window at: " + marker.getTitle());
+            //Update count of POI
             dialog.dismiss();
         });
     }

@@ -37,6 +37,8 @@ android {
     }
 }
 
+apply(plugin = "com.google.gms.google-services")
+
 dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -45,5 +47,11 @@ dependencies {
     implementation(libs.junit)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
+    implementation(libs.firebase.firestore)
+
+    // Firebase BoM manages versions automatically
+    implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
+
+    implementation("com.google.firebase:firebase-firestore")
 
 }
