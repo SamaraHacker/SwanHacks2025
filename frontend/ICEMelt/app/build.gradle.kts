@@ -44,5 +44,6 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.junit)
     implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
 
 }
