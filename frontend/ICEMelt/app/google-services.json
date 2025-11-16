@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "336032225486",
+    "project_id": "icemelt-64187",
+    "storage_bucket": "icemelt-64187.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:336032225486:android:f0a037ee07f6428e4c989f",
+        "android_client_info": {
+          "package_name": "com.jelhackers.icemelt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCm6_XcqOUglQdLZuTiq41nzkaGxjtDErY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
