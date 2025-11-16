@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-        android:layout_marginBottom="200dp"
+        android:layout_marginBottom="225dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -67,8 +67,27 @@
         android:id="@+id/recyclerItems"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        app:layout_constraintTop_toBottomOf="@id/map"
+        app:layout_constraintTop_toBottomOf="@id/distanceBar"
         android:backgroundTint="@color/white"/>
+
+    <LinearLayout
+        android:id="@+id/distanceBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/map">
+        <SeekBar
+            android:id="@+id/distanceSelect"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:tickMarkTint="@color/black"
+            android:backgroundTint="@color/white" />
+        <TextView
+            android:id="@+id/distanceRangeTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Range:"/>
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

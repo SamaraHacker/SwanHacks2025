@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -39,12 +40,15 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.time.Instant;
 import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
+    private double radiusMeters;
     public FirebaseFirestore db;
+    private POIController poiController;
 
     private ActivityMapsBinding binding;
 
@@ -59,7 +63,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient fusedLocationClient;
     private LatLng currentLocation;
 
+    private SeekBar distanceControl;
+    private TextView distanceControlTxt;
+
     private ArrayList<POIObject> poiArrayList;
+    private POIAdapter adapter;
 
     RecyclerView recyclerItems;
 
@@ -71,8 +79,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         FirebaseApp app = FirebaseApp.getInstance();
         String projectId = app.getOptions().getProjectId();
         Log.d("FIREBASE_DEBUG", "Connected to Firestore project: " + projectId);
+        radiusMeters = 20000;
 
-        db = FirebaseFirestore.getInstance();
+        poiController = new POIController();
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -91,20 +100,58 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Assigning ID of textView2 to a variable
         dropDownImageView = findViewById(R.id.textView2);
 
-        //recyclerItems = findViewById(R.id.recyclerItems);
-        //POIAdapter adapter = new POIAdapter(poiArrayList, this);
+        poiArrayList = new ArrayList<>();
+        recyclerItems = findViewById(R.id.recyclerItems);
+        adapter = new POIAdapter(poiArrayList, this, position -> {
+            // Get the clicked POI
+            POIObject poi = poiArrayList.get(position);
+            LatLng poiLatLng = new LatLng(poi.getLat(), poi.getLon());
 
-        //GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
+            // Move camera to POI
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(poiLatLng, 18));
+        });
 
-        //recyclerItems.setLayoutManager(layoutManager);
-        //recyclerItems.setAdapter(adapter);
-        //recyclerItems.smoothScrollToPosition(poiArrayList.size());
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
 
-
+        recyclerItems.setLayoutManager(layoutManager);
+        recyclerItems.setAdapter(adapter);
+        recyclerItems.smoothScrollToPosition(poiArrayList.size());
 
         // "on click" operations to be performed
         dropDownImageView.setOnClickListener(v -> {
             //Bring up drop down
+        });
+
+        distanceControlTxt = findViewById(R.id.distanceRangeTxt);
+        distanceControlTxt.setText("Range: " + (int)(radiusMeters / 1000)+ "km");
+        distanceControl = findViewById(R.id.distanceSelect);
+        distanceControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                double minDistance = 100;
+                double maxDistance = 2_000_000;
+                radiusMeters = minDistance * Math.pow(maxDistance / minDistance, progress / 100.0);
+                if((int) (radiusMeters / 1000) < 1){
+                    distanceControlTxt.setText("Range: " + (int)(radiusMeters) + "m");
+                } else {
+                    distanceControlTxt.setText("Range: " + (int)(radiusMeters / 1000)+ "km");
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mMap.clear();
+                poiArrayList.clear();
+                adapter.notifyDataSetChanged();
+                mMap.addMarker(new MarkerOptions().position(currentLocation).title("You are here"));
+                retrieveAllMarkers();
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
+            }
         });
     }
     @Override
@@ -114,11 +161,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
-        //Location
+        //Default location
+        currentLocation = new LatLng(-34, 151); // fallback
         getCurrentLocation();
         // Add a marker in Sydney and move the camera
-
-        retrieveAllMarkers();
 
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
@@ -144,23 +190,45 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (location != null) {
                 userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                 Log.d("LOCATION", "User location: " + userLatLng);
+                currentLocation = userLatLng;
             } else {
                 userLatLng = new LatLng(-34, 151); // fallback
                 Log.d("LOCATION", "Location null, using fallback");
             }
 
-            // MOVE CAMERA HERE ✔
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15));
 
-            // OPTIONAL: Add marker for user location
             mMap.addMarker(new MarkerOptions().position(userLatLng).title("You are here"));
+            retrieveAllMarkers();
         });
     }
 
 
     public void retrieveAllMarkers(){
         //Get all POIS and add them to the array list
+        poiController.getNearbyPois(currentLocation.latitude, currentLocation.longitude, radiusMeters, new POIController.POIListener() {
+            @Override
+            public void onPoisRetrieved(ArrayList<POIObject> pois) {
+                for (POIObject poi : pois) {
+                    if (poi != null) {
+                        Log.d("NearbyPOI", "POI: " + poi.getLocationName());
+                        Marker marker = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(poi.getLat(), poi.getLon()))
+                                .title(poi.getLocationName())
+                                .snippet(alertTypes[poi.getAlertType()])
+                                .icon(bitmapDescriptorFromVector(alertImages[poi.getAlertType()])));
+                        marker.hideInfoWindow();
+                        poiArrayList.add(poi);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
 
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("NearbyPOI", "Failed to get nearby POIs", e);
+            }
+        });
         //Iterate through the arraylist and add a pointer for each POI
         LatLng sydneyLatLong = new LatLng(-34, 151);
         Marker sydney = mMap.addMarker(
@@ -225,12 +293,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             String description = descriptionTxt.getText().toString();
             int typeIndex = reportTypes.getSelectedItemPosition();
 
-            POIObject newPoi = new POIObject(latlng.latitude, latlng.longitude, typeIndex, locationName, description);
-
-            db.collection("POI")
-                    .add(newPoi)
-                    .addOnSuccessListener(aVoid -> Log.d("POIController","POI added"))
-                    .addOnFailureListener(e -> Log.e("POIController","Failed to add POI", e));
+            poiController.createPoi((float)latlng.latitude, (float)latlng.longitude, typeIndex, locationName, description);
             dialog.dismiss();
 
 
@@ -276,11 +339,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ImageButton btnReport = popupView.findViewById(R.id.reportPOI);
         ImageButton btnConfirmPOI = popupView.findViewById(R.id.confirmPOI);
         // Get the POI and fill in the data based on that
-        txtLocation.setText(marker.getTitle());
-        txtAge.setText("Age: 27");
-        txtDescription.setText("Description: Cool place!");
-        txtReportCount.setText("20 Reports");
+        poiController.getPoi(marker.getTitle(), new POIController.POICallback() {
+            @Override
+            public void onResult(POIObject poi) {
+                if (poi != null) {
+                    txtLocation.setText(marker.getTitle());
+                    txtDescription.setText(poi.getLocationDescription());
+                    txtReportCount.setText(poi.getReportCount() + " Reports");
+                    long timeInSeconds = Instant.now().getEpochSecond() - poi.getStartTime();
+                    if(timeInSeconds / 60 /3600 < 1){
+                        txtAge.setText(timeInSeconds / 60 + " min(s) ago");
+                    } else {
+                        txtAge.setText(timeInSeconds / 60 / 3600 + " hr(s) ago");
+                    }
+                } else {
+                    // Handle not found
+                }
+            }
 
+            @Override
+            public void onError(Exception e) {
+                // Handle error
+            }
+        });
         // Create & show dialog
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(popupView)
@@ -292,12 +373,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         btnReport.setOnClickListener(v -> {
             Log.d("REPORT_CLICK", "User clicked info window at: " + marker.getTitle());
             //Delete the POI
+            poiController.deletePoi(marker.getTitle());
+            marker.remove();
             dialog.dismiss();
         });
 
         btnConfirmPOI.setOnClickListener(v -> {
             Log.d("REPORT_CLICK", "User clicked info window at: " + marker.getTitle());
             //Update count of POI
+            poiController.incrementReportCount(marker.getTitle());
             dialog.dismiss();
         });
     }
