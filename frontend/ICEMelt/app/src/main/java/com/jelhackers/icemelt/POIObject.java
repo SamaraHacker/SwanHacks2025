@@ -16,7 +16,7 @@ public class POIObject {
 
     //statics
     private final String[] alertTypes = {
-            "ICE Spotted", "Shots Fired", "Bomb threats", "Electric Malfunction", "Gas Leak", "Dangerous Wildlife"
+            "ICE Spotted", "Shots Fired", "Dangerous Wildlife", "Fire", "Car Accident"
     };
     public POIObject(){
         this(0,0,0, "Not Found", "None");
