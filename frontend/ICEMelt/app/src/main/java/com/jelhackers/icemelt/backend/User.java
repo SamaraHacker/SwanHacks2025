@@ -1,4 +1,5 @@
 import backend.POI;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 public class User {
 
