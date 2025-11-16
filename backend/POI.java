@@ -1,6 +1,8 @@
 import java.time.LocalDateTime;
 
 public class POI{
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    DocumentReference doc;
 
     //Useful vars
     private int id;
@@ -25,7 +27,8 @@ public class POI{
         this.alertType = ALERTS[type];
         this.dateTime = LocalDateTime.now();
         this.id = idIter;
-        idIter+=1;
+        idIter++;
+        this.doc = db.collection("POI").document(locationName);
     }
 
     //Start getters/setters
@@ -38,7 +41,9 @@ public class POI{
     public void setLon(long lon){this.lon = lon;}
 
     public String getAlertType(){return this.alertType;}
-    public void setAlertType(int type){this.alertType = ALERTS[type];}
+    public void setAlertType(int type){
+        this.alertType = ALERTS[type];
+    }
 
     public String getLocationName(){return this.locationName;}
     public void setLocationName(String name){this.locationName = name;}
@@ -52,9 +57,8 @@ public class POI{
     }
 
     public boolean addToDb(){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         try{
-            db.collection("POI").document(locationName).set(this);
+           doc.set(this);
             return true;
         }catch(Error e){
             Log.w(TAG, "Error writing document", e);
