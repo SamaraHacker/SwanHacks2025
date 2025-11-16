@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -33,6 +35,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jelhackers.icemelt.UserStartScreen.JavaSignUpScreen;
+import com.jelhackers.icemelt.UserStartScreen.JavaStartScreen;
 import com.jelhackers.icemelt.databinding.ActivityMapsBinding;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -40,6 +44,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.Serial;
 import java.time.Instant;
 import java.util.ArrayList;
 
@@ -52,7 +57,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private ActivityMapsBinding binding;
 
-    private TextView dropDownImageView;
+    private ImageView dropDownImageView;
 
     private final String[] alertTypes = {
             "ICE RAID"
@@ -98,7 +103,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Assigning ID of textView2 to a variable
-        dropDownImageView = findViewById(R.id.textView2);
+        dropDownImageView = findViewById(R.id.iamgeView);
 
         poiArrayList = new ArrayList<>();
         recyclerItems = findViewById(R.id.recyclerItems);
@@ -117,9 +122,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         recyclerItems.setAdapter(adapter);
         recyclerItems.smoothScrollToPosition(poiArrayList.size());
 
-        // "on click" operations to be performed
         dropDownImageView.setOnClickListener(v -> {
-            //Bring up drop down
+            Intent i = new Intent(MapsActivity.this, Settings.class);
+            startActivity(i);
         });
 
         distanceControlTxt = findViewById(R.id.distanceRangeTxt);
@@ -229,15 +234,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.e("NearbyPOI", "Failed to get nearby POIs", e);
             }
         });
-        //Iterate through the arraylist and add a pointer for each POI
-        LatLng sydneyLatLong = new LatLng(-34, 151);
-        Marker sydney = mMap.addMarker(
-                new MarkerOptions()
-                        .position(sydneyLatLong)
-                        .title("Sydney")
-                        .snippet(alertTypes[0])
-                        .icon(bitmapDescriptorFromVector(alertImages[0])));
-        sydney.hideInfoWindow();
     }
 
     private BitmapDescriptor bitmapDescriptorFromVector(int vectorResId) {

@@ -24,7 +24,19 @@
             android:value="${MAPS_KEY}" />
         <activity
             android:name=".MapsActivity"
-            android:exported="true" >
+            android:exported="false" >
+        </activity>
+        <activity
+            android:name=".Settings"
+            android:exported="false" >
+        </activity>
+        <activity
+            android:name=".UserStartScreen.JavaSignUpScreen"
+            android:exported="false" >
+        </activity>
+        <activity
+            android:name=".UserStartScreen.JavaStartScreen"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
