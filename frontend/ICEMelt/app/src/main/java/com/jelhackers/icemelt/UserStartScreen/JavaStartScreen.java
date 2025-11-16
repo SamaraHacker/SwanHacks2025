@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import com.jelhackers.icemelt.backend.User;
+import com.jelhackers.icemelt.backend.UserController;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +19,7 @@ public class JavaStartScreen extends AppCompatActivity {
 
     private EditText usernameInput, passwordInput;
     private Button loginBtn, toSignUp;
+    UserController uc = new UserController();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,21 +53,25 @@ public class JavaStartScreen extends AppCompatActivity {
                 String password = passwordInput.getText().toString();
 
                 // Now we can use the variables
-
-
-                // TESTING: Works
-
-
-                Log.d("LOGIN", "Username: " + username);
-                Log.d("LOGIN", "Password" + password);
-
-
-                if (username.equals("admin") && password.equals("123")) {
-                    Toast.makeText(com.jelhackers.icemelt.UserStartScreen.JavaStartScreen.this, "Login success!", Toast.LENGTH_SHORT).show();
+                ApiFuture<QuerySnapshot> future = db.collection("User").get();
+                try{
+                    QuerySnapshot querySnapshot = future.get();
+                    List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+                    for (QueryDocumentSnapshot doc : documents) {
+                        User dUser = doc.getData().get(doc.getId())
+                        if(username == dUser.getUsername()){
+                            if(password == dUser.getPassword()){
+                                //access map screen
+                                Log.d(TAG, "Login successful");
+                            }
+                            Log.d(TAG, "Password incorrect");
+                        }
+                        Log.d(TAG, "User not found");
+                    }
+                }catch(Error e){
+                    throw e;
                 }
-                else{
-                    Toast.makeText(com.jelhackers.icemelt.UserStartScreen.JavaStartScreen.this, "Login failed!", Toast.LENGTH_SHORT).show();
-                }
+
 
             }
         });

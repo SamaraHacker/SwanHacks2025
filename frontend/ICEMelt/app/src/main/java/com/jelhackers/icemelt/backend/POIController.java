@@ -8,7 +8,7 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-public class Main {
+public class POIController {
     
 
     public POI createPoi(long lat, long lon, int type, User author){

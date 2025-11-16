@@ -1,3 +1,5 @@
+package com.jelhackers.icemelt.backend.User;
+
 import backend.POI;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -53,6 +55,11 @@ public class User {
     public List<POI> getPoisPlaced(){return poisPlaced;}
     public void addPoi(POI p){poisPlaced.add(p);}
     public void removePoi(POI p){poisPlaced.delete(p);}
+
+
+    public String toString(){
+        return "user: " + username + " -- pass: " + password + " -- email: " + email;
+    }
 
      public boolean addToDb(){
         try{

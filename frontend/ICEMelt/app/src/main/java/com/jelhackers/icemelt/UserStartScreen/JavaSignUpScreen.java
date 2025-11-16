@@ -7,7 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import com.jelhackers.icemelt.backend.User;
+import com.jelhackers.icemelt.backend.UserController;
 import androidx.appcompat.app.AppCompatActivity;
 
 
@@ -18,6 +19,8 @@ public class JavaSignUpScreen extends AppCompatActivity {
 
     private EditText emailSignupInput, passwordSignupInput, usernameSignupInput;
     private Button signUpBtn, toLogin;
+
+    UserController uc = new UserController();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,22 +47,11 @@ public class JavaSignUpScreen extends AppCompatActivity {
                 String username = usernameSignupInput.getText().toString();
                 String password = passwordSignupInput.getText().toString();
                 String email = emailSignupInput.getText().toString();
-
-
-                // TESTING
-
-                Log.d("SIGNUP", "Username: " + username);
-                Log.d("SIGNUP", "Password" + password);
-                Log.d("SIGNUP", "email: " + email);
-
-
-                if (username.equals("admin") && password.equals("123") && email.equals("esantana@iastate.edu")) {
-                    Toast.makeText(com.jelhackers.icemelt.UserStartScreen.JavaSignUpScreen.this, "Sign up success!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(com.jelhackers.icemelt.UserStartScreen.JavaSignUpScreen.this, "Sign up failed!", Toast.LENGTH_SHORT).show();
+                try{
+                    System.out.println(uc.addUser(username, password, email).toString());
+                }catch(Error e){
+                    throw e;
                 }
-
-
             }
         });
 

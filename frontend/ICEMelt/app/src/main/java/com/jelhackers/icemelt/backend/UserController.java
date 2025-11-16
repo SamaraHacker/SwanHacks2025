@@ -1,3 +1,5 @@
+package com.jelhackers.icemelt.backend.UserController;
+
 import backend.POI;
 import backend.User;
 import com.google.api.core.ApiFuture;
@@ -7,7 +9,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-public class Main {
+public class UserController {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
