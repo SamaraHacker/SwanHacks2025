@@ -20,7 +20,20 @@
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:src="@drawable/account_circle" />
-        
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:hint="Email"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textSize="20sp"
+            android:background="@drawable/rounded_corner"
+            android:padding="18dp"
+            android:inputType="text"
+            android:id="@+id/email_signup_input"/>
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,7 +45,7 @@
             android:background="@drawable/rounded_corner"
             android:padding="18dp"
             android:inputType="text"
-            android:id="@+id/username_input"/>
+            android:id="@+id/username_signup_input"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,29 +57,31 @@
             android:background="@drawable/rounded_corner"
             android:padding="18dp"
             android:inputType="textPassword"
-            android:id="@+id/password_input"/>
-        
+            android:id="@+id/password_signup_input"/>
+
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login"
-            android:backgroundTint="@color/white"
-            android:textColor="#3B84F1"
-            android:padding="18dp"
-            android:layout_marginTop="32dp"
-            android:textSize="20sp"
-            android:id="@+id/login_btn"/>
-
-        <Button
-            android:layout_width="100dp"
-            android:layout_height="100dp"
             android:text="Sign Up"
             android:backgroundTint="@color/white"
             android:textColor="#3B84F1"
             android:padding="18dp"
             android:layout_marginTop="32dp"
             android:textSize="20sp"
-            android:id="@+id/to_signup_btn"/>
+            android:id="@+id/signup_btn"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Back To Login"
+            android:backgroundTint="@color/white"
+            android:textColor="#3B84F1"
+            android:padding="18dp"
+            android:layout_marginTop="32dp"
+            android:textSize="20sp"
+            android:id="@+id/to_login"/>
+
+
 
 
     </LinearLayout>

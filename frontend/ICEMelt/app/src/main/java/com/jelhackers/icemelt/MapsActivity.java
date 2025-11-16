@@ -3,6 +3,11 @@ package com.jelhackers.icemelt;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,8 +19,16 @@ import com.jelhackers.icemelt.databinding.ActivityMapBinding;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    private EditText usernameInput, passwordInput;
+    private Button loginBtn;
+
+
     private GoogleMap mMap;
     private ActivityMapBinding binding;
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +41,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        // For retrieving strings for login
+        // LOGIN SCREEN
+        setContentView(R.layout.activity_main);
+
+        // 1. Connect java variables to XML views
+        usernameInput = findViewById(R.id.username_input);
+        passwordInput = findViewById(R.id.password_input);
+        loginBtn = findViewById(R.id.login_btn);
+
+        // Handle button clicks
+        loginBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                String username = usernameInput.getText().toString();
+                String password = passwordInput.getText().toString();
+
+                // Now we can use the variables
+                Log.d("LOGIN", "Username: " + username);
+                Log.d("LOGIN", "Password" + password);
+
+                // TESTING
+                if (username.equals("admin") && password.equals("123")) {
+                    Toast.makeText(MapsActivity.this, "Login success!", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(MapsActivity.this, "Login failed!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+
+
     }
 
     /**
