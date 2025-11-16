@@ -10,7 +10,7 @@ public class POI{
     private long lon;
     private String alertType; 
     private String locationName;
-    private LocalDateTime dateTime;
+    private long startTime;
 
     //statics
     private static String ALERTS[] = {"ICE SPOTTED","",""};
@@ -25,7 +25,7 @@ public class POI{
         this.lat = lat;
         this.lon = lon;
         this.alertType = ALERTS[type];
-        this.dateTime = LocalDateTime.now();
+        this.startTime = Instant.now().getEpochSecond();
         this.id = idIter;
         idIter++;
         this.doc = db.collection("POI").document(locationName);
@@ -48,11 +48,11 @@ public class POI{
     public String getLocationName(){return this.locationName;}
     public void setLocationName(String name){this.locationName = name;}
 
-    public String getDateTimeS(){return dateTime.toString();}
+    public long getStartTime(){return startTime;}
     //End getters/setters
 
     public String toString(){
-        return alertType.toLowerCase() + " at location: " + locationName + " at: " + dateTime.toString() 
+        return alertType.toLowerCase() + " at location: " + locationName 
         + "\nLatitiude: " + lat + "   Longitude: " + lon;
     }
 
