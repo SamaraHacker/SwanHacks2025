@@ -17,6 +17,8 @@ public class POIController {
 
     public FirebaseFirestore db;
 
+    long timeTriggered = Instant.now().getEpochSecond() + 8640;
+
     public POIController() {
         db = FirebaseFirestore.getInstance();
     }
@@ -147,6 +149,45 @@ public class POIController {
     public interface POIListener {
         void onPoisRetrieved(ArrayList<POIObject> pois);
         void onFailure(Exception e);
+    }
+
+    public void getAllPois(POIListener listener){
+        ArrayList<POIObject> allPois = new ArrayList<>();
+
+        db.collection("POI").get()
+                .addOnSuccessListener(querySnapshot -> {
+                    for(QueryDocumentSnapshot doc : querySnapshot) {
+                        POIObject poi = doc.toObject(POIObject.class);
+                        if (poi != null) {
+                            allPois.add(poi);
+                        }
+                    }
+                    listener.onPoisRetrieved(allPois);
+                }).addOnFailureListener(e -> {
+                    Log.e("POIController", "Error retrieving POIs", e);
+                    listener.onFailure(e);
+                });
+    }
+
+    public void poiTimeCheck(){
+        if(timeTriggered <= Instant.now().getEpochSecond()) {
+            timeTriggered = Instant.now().getEpochSecond() + 8640;
+            getAllPois(new POIListener() {
+                @Override
+                public void onPoisRetrieved(ArrayList<POIObject> pois) {
+                    for (POIObject p : pois) {
+                        if (Instant.now().getEpochSecond() - p.getStartTime() > 8640) {
+                            deletePoi(p.getLocationName());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Log.e("AllPois", "Failed to get nearby POIs", e);
+                }
+            });
+        }
     }
 
 //    public void poiTimeCheck(){

@@ -16,10 +16,24 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Rush Report"
+            android:layout_marginTop="32dp"
+            android:paddingBottom="20dp"
+            android:paddingTop="40dp"
+            android:paddingLeft="80dp"
+            android:textSize="40dp"
+            android:textColor="@color/white"
+            ></TextView>
+
         <ImageView
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:src="@drawable/account_circle" />
+            android:src="@drawable/outline_campaign_24"
+            />
+
 
         <EditText
             android:layout_width="match_parent"

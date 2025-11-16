@@ -1,8 +1,10 @@
 package com.jelhackers.icemelt;
 
 import java.time.Instant;
+import com.jelhackers.icemelt.POIController;
 
 public class POIObject {
+    POIController pc = new POIController();
 
     //Useful vars
     private String id;
@@ -31,6 +33,7 @@ public class POIObject {
         this.locationName = locationName;
         this.id = locationName;
         this.reportCount = 1;
+        pc.poiTimeCheck();
     }
 
     //Start getters/setters
