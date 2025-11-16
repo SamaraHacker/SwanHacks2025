@@ -16,7 +16,7 @@ public class POIObject {
 
     //statics
     private final String[] alertTypes = {
-            "ICE SPOTTED"
+            "ICE Spotted", "Shots Fired", "Bomb threats", "Electric Malfunction", "Gas Leak", "Dangerous Wildlife"
     };
     public POIObject(){
         this(0,0,0, "Not Found", "None");
@@ -51,8 +51,8 @@ public class POIObject {
     public String getLocationName(){return this.locationName;}
     public void setLocationName(String name){this.locationName = name;}
 
-    public String getLocationDescription(){return this.locationName;}
-    public void setLocationDescription(String name){this.locationName = name;}
+    public String getLocationDescription(){return this.locationDescription;}
+    public void setLocationDescription(String name){this.locationDescription = name;}
 
     public long getStartTime(){return startTime;}
 

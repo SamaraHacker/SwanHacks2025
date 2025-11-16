@@ -60,10 +60,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ImageView dropDownImageView;
 
     private final String[] alertTypes = {
-            "ICE RAID"
+            "ICE Spotted", "Shots Fired", "Bomb threats", "Electric Malfunction", "Gas Leak", "Dangerous Wildlife"
     };
     private final int[] alertImages = {
-            R.drawable.baseline_check_box_outline_blank_24
+            R.drawable.baseline_check_box_outline_blank_24, R.drawable.baseline_check_box_outline_blank_24, R.drawable.baseline_check_box_outline_blank_24, R.drawable.baseline_check_box_outline_blank_24, R.drawable.baseline_check_box_outline_blank_24, R.drawable.baseline_check_box_outline_blank_24
     };
     private FusedLocationProviderClient fusedLocationClient;
     private LatLng currentLocation;
