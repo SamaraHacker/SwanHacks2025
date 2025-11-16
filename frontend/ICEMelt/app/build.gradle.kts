@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.map.secret)
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+
 }
 
 android {
@@ -32,18 +33,19 @@ android {
     }
     buildFeatures {
         viewBinding = true
-        dataBinding = true
-        buildConfig = true
     }
 }
 
 dependencies {
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.junit)
     implementation(libs.play.services.maps)
-    implementation(libs.play.services.location)
-
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
+    implementation("com.google.firebase:firebase-analytics")
 }
