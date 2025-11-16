@@ -112,6 +112,25 @@ public class POIController {
                 });
     }
 
+    public void getAllPois(POIListener listener){
+        ArrayList<POIObject> allPois = new ArrayList<>();
+
+        db.collection("POI").get()
+                .addOnSuccessListener(querySnapshot -> {
+                    for(QueryDocumentSnapshot doc : querySnapshot) {
+                        POIObject poi = doc.toObject(POIObject.class);
+                        if (poi != null) {
+                            allPois.add(poi);
+                        }
+                    }
+                    listener.onPoisRetrieved(allPois);
+                }).addOnFailureListener(e -> {
+                    Log.e("POIController", "Error retrieving POIs", e);
+                    listener.onFailure(e);
+                });
+    }
+
+
     public void getNearbyPois(double userLat, double userLon, double radiusMeters, POIListener listener) {
         ArrayList<POIObject> nearbyPois = new ArrayList<>();
 
@@ -149,21 +168,24 @@ public class POIController {
         void onFailure(Exception e);
     }
 
-//    public void poiTimeCheck(){
-//        ApiFuture<QuerySnapshot> future = db.collection("POI").get();
-//        try{
-//            QuerySnapshot querySnapshot = future.get();
-//            List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
-//            for (QueryDocumentSnapshot doc : documents) {
-//                POI dPoi = doc.getData().get(doc.getId())
-//                if(dPoi.getStartTime() - Instant.now().getEpochSecond() >= 8640){
-//                    doc.delete();
-//                }
-//            }
-//        }catch(Error e){
-//            throw e;
-//        }
-//    }
+    public void poiTimeCheck(){
+        getAllPois(new POIListener() {
+            @Override
+            public void onPoisRetrieved(ArrayList<POIObject> pois) {
+                for(POIObject p : pois){
+                    if(Instant.now().getEpochSecond() - p.getStartTime() > 8640){
+                        deletePoi(p.getLocationName());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("AllPois", "Failed to get nearby POIs", e);
+            }
+        });
+
+   }
 //
 //    public QueryDocumentSnapshot searchForPoi(POI p){
 //        ApiFuture<QuerySnapshot> future = db.collection("POI").get();
